@@ -14,7 +14,7 @@ void GRID::load_partition(std::istream &np_in, std::istream &cp_in)
     }
 }
 
-void TET_GRID::write(std::ostream &out)
+void GRID::write(std::ostream &out)
 {
     /// File Header
     out << "TITLE=\"" << m_title << "\"" << std::endl;
@@ -27,11 +27,27 @@ void TET_GRID::write(std::ostream &out)
     out << "\"" << m_cell_par.name << "\"" << std::endl;
 
     /// Zone Record
-    out << "ZONE T=\"" << m_zone_text << "\"" << std::endl;
+    if(m_zone_text.empty())
+        out << "ZONE" << std::endl;
+    else
+        out << "ZONE T=\"" << m_zone_text << "\"" << std::endl;
     out << "STRANDID=" << m_strand << std::endl;
     out << "NODES=" << m_nn << std::endl;
     out << "ELEMENTS=" << m_nc << std::endl;
-    out << "ZONETYPE=" << "FETETRAHEDRON" << std::endl;
+    out << "ZONETYPE=";
+    switch (m_tp)
+    {
+    case FE_MESH_TYPE::TET:
+        out << "FETETRAHEDRON" << std::endl;
+        break;
+    case FE_MESH_TYPE::HEX:
+        out << "FEBRICK" << std::endl;
+        break;
+    case FE_MESH_TYPE::POLY:
+        out << "FEPOLYHEDRON" << std::endl;
+    default:
+        break;
+    }
     out << "DATAPACKING=BLOCK" << std::endl;
     out << "VARLOCATION=([1-4]=NODAL,[5]=CELLCENTERED)" << std::endl;
 
@@ -54,61 +70,7 @@ void TET_GRID::write(std::ostream &out)
     /// Partition of cells
     m_cell_par.write(out, RECORD_PER_LINE, SEP);
 
-    /// Connectivity
-    for(size_t i = 0; i < m_nc; ++i)
-    {
-        for(size_t j = 0; j < 4; ++j)
-            out << SEP << at(i, j);
-        out << std::endl;
-    }
-}
-
-void HEX_GRID::write(std::ostream &out)
-{
-    /// File Header
-    out << "TITLE=\"" << m_title << "\"" << std::endl;
-    out << "FILETYPE=GRID" << std::endl;
-    out << "VARIABLES=";
-    out << "\"" << m_x.name << "\",";
-    out << "\"" << m_y.name << "\",";
-    out << "\"" << m_z.name << "\",";
-    out << "\"" << m_node_par.name << "\",";
-    out << "\"" << m_cell_par.name << "\"" << std::endl;
-
-    /// Zone Record
-    out << "ZONE T=\"" << m_zone_text << "\"" << std::endl;
-    out << "STRANDID=" << m_strand << std::endl;
-    out << "NODES=" << m_nn << std::endl;
-    out << "ELEMENTS=" << m_nc << std::endl;
-    out << "ZONETYPE=" << "FEBRICK" << std::endl;
-    out << "DATAPACKING=BLOCK" << std::endl;
-    out << "VARLOCATION=([1-4]=NODAL,[5]=CELLCENTERED)" << std::endl;
-
-    /// Format param
-    static const size_t RECORD_PER_LINE = 10;
-    static const char SEP = ' ';
-
-    /// X-Coordinates
-    m_x.write(out, RECORD_PER_LINE, SEP);
-
-    /// Y-Coordinates
-    m_y.write(out, RECORD_PER_LINE, SEP);
-
-    /// Z-Coordinates
-    m_z.write(out, RECORD_PER_LINE, SEP);
-
-    /// Connectivity
-    for(size_t i = 0; i < m_nc; ++i)
-    {
-        for(size_t j = 0; j < 8; ++j)
-            out << SEP << at(i, j);
-        out << std::endl;
-    }
-}
-
-void POLY_GRID::write(std::ostream &out)
-{
-    throw std::runtime_error("Polyhedral grid is NOT supported currently!");
+    write_connectivity(out);
 }
 
 void DATA::write(std::ostream &out)
@@ -140,7 +102,7 @@ void DATA::write(std::ostream &out)
         out << "FEBRICK";
         break;
     case FE_MESH_TYPE::POLY:
-        throw std::runtime_error("Polyhedral data is NOT supported currently!");
+        out << "FEPOLYHEDRON";
     default:
         break;
     }

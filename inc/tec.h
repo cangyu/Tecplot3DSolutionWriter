@@ -41,6 +41,7 @@ struct HEADER
 class GRID : public HEADER
 {
 protected:
+    FE_MESH_TYPE m_tp;
     DATA_BLOCK<double> m_x;
     DATA_BLOCK<double> m_y;
     DATA_BLOCK<double> m_z;
@@ -48,7 +49,7 @@ protected:
     DATA_BLOCK<size_t> m_cell_par;
 
 public:
-    GRID()
+    GRID(FE_MESH_TYPE tp): m_tp(tp)
     {
         m_x.name = "X";
         m_y.name = "Y";
@@ -57,67 +58,15 @@ public:
         m_cell_par.name = "CELL_PARTITION";
     }
 
+    virtual ~GRID() = default;
+
     virtual void read(std::istream &in) = 0;
 
-    virtual void write(std::ostream &out) = 0;
+    void write(std::ostream &out);
+
+    virtual void write_connectivity(std::ostream &out) = 0;
 
     void load_partition(std::istream &np_in, std::istream &cp_in);
-};
-
-class TET_GRID : public GRID
-{
-protected:
-    std::vector<size_t> m_connect;
-
-public:
-    TET_GRID() = default;
-
-    size_t at(size_t i, size_t j) const
-    {
-        return m_connect.at(4 * i + j);
-    }
-
-    size_t &at(size_t i, size_t j)
-    {
-        return m_connect.at(4 * i + j);
-    }
-
-    void write(std::ostream &out) override;
-};
-
-class HEX_GRID : public GRID
-{
-protected:
-    std::vector<size_t> m_connect;
-
-public:
-    HEX_GRID() = default;
-
-    size_t at(size_t i, size_t j) const
-    {
-        return m_connect.at(8 * i + j);
-    }
-
-    size_t &at(size_t i, size_t j)
-    {
-        return m_connect.at(8 * i + j);
-    }
-
-    void write(std::ostream &out) override;
-};
-
-class POLY_GRID : public GRID
-{
-private:
-    size_t n_tet, n_hex, n_pyramid, n_prism; /// Composition of the grid
-
-public:
-    POLY_GRID()
-    {
-        n_tet = n_hex = n_prism = n_pyramid = 0;
-    }
-
-    void write(std::ostream &out) override;
 };
 
 class DATA : public HEADER
