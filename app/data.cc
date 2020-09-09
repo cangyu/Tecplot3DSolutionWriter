@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <cstring>
 #include "../inc/tec.h"
 
 class TransientDataLoader : DATA

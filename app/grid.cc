@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include "../inc/tec.h"
 
 class HomogeneousMeshLoader : public GRID
