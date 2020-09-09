@@ -66,7 +66,17 @@ public:
 
     virtual void write_connectivity(std::ostream &out) = 0;
 
-    void load_partition(std::istream &np_in, std::istream &cp_in);
+    void load_node_partition(std::istream &in)
+    {
+        for(auto &e : m_node_par.data)
+            in >> e;
+    }
+
+    void load_cell_partition(std::istream &in)
+    {
+        for(auto &e : m_cell_par.data)
+            in >> e;
+    }
 };
 
 class DATA : public HEADER
@@ -83,7 +93,7 @@ public:
 
     void write(std::ostream &out);
 
-    ~DATA()
+    virtual ~DATA()
     {
         for(auto e: m_var)
             delete e;

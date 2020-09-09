@@ -1,19 +1,6 @@
 #include <stdexcept>
 #include "../inc/tec.h"
 
-void GRID::load_partition(std::istream &np_in, std::istream &cp_in)
-{
-    for(auto &e : m_node_par.data)
-    {
-        np_in >> e;
-    }
-
-    for(auto &e : m_cell_par.data)
-    {
-        cp_in >> e;
-    }
-}
-
 void GRID::write(std::ostream &out)
 {
     /// File Header

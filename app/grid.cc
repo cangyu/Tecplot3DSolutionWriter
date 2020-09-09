@@ -95,11 +95,6 @@ protected:
         m_connect.resize(NODE_PER_CELL*m_nc);
     }
 
-    [[nodiscard]] size_t at(size_t i, size_t j) const
-    {
-        return m_connect.at(NODE_PER_CELL * i + j);
-    }
-
     size_t &at(size_t i, size_t j)
     {
         return m_connect.at(NODE_PER_CELL * i + j);
@@ -126,6 +121,10 @@ int main(int argc, char *argv[])
 {
     std::string input_path;
     std::string output_path;
+    std::string zone_text;
+    std::string title;
+    std::string node_partition_path;
+    std::string cell_partition_path;
     FE_MESH_TYPE composition;
     GRID *loader;
 
@@ -136,6 +135,14 @@ int main(int argc, char *argv[])
             input_path = argv[cnt + 1];
         else if (!std::strcmp(argv[cnt], "--output"))
             output_path = argv[cnt + 1];
+        else if(!std::strcmp(argv[cnt], "--zone-text"))
+            zone_text = argv[cnt + 1];
+        else if(!std::strcmp(argv[cnt], "--title"))
+            title = argv[cnt + 1];
+        else if(!std::strcmp(argv[cnt], "--node-partition"))
+            node_partition_path = argv[cnt + 1];
+        else if(!std::strcmp(argv[cnt], "--cell-partition"))
+            cell_partition_path = argv[cnt + 1];
         else if (!std::strcmp(argv[cnt], "--composition"))
         {
             std::string tmp(argv[cnt + 1]);
@@ -167,18 +174,57 @@ int main(int argc, char *argv[])
         break;
     }
 
-    std::ifstream in(input_path);
-    if(in.fail())
+    if(input_path.empty())
         return -1;
+    else
+    {
+        std::ifstream in(input_path);
+        if(in.fail())
+            return -2;
 
-    loader->read(in);
-    in.close();
+        loader->read(in);
 
-    std::ofstream out(output_path);
-    if(out.fail())
-        return -2;
-    loader->write(out);
-    out.close();
+        in.close();
+    }
+
+    if(!zone_text.empty())
+        loader->m_zone_text = zone_text;
+
+    if(!title.empty())
+        loader->m_title = title;
+
+    if(!node_partition_path.empty())
+    {
+        std::ifstream in(node_partition_path);
+        if(in.fail())
+            return -3;
+
+        loader->load_node_partition(in);
+
+        in.close();
+    }
+
+    if(!cell_partition_path.empty())
+    {
+        std::ifstream in(cell_partition_path);
+        if(in.fail())
+            return -4;
+
+        loader->load_cell_partition(in);
+
+        in.close();
+    }
+
+    if(!output_path.empty())
+    {
+        std::ofstream out(output_path);
+        if(out.fail())
+            return -5;
+
+        loader->write(out);
+
+        out.close();
+    }
 
     delete loader;
 
