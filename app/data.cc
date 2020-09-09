@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "../inc/tec.h"
 
-class CfdDataLoader : DATA
+class TransientDataLoader : DATA
 {
 public:
     void read(std::istream &in) override
