@@ -14,10 +14,10 @@ void GRID::write(std::ostream &out)
     out << "\"" << m_cell_par.name << "\"" << std::endl;
 
     /// Zone Record
-    if(m_zone_text.empty())
-        out << "ZONE" << std::endl;
-    else
-        out << "ZONE T=\"" << m_zone_text << "\"" << std::endl;
+    out << "ZONE";
+    if(!m_zone_text.empty())
+        out << " T=\"" << m_zone_text << "\"";
+    out << std::endl;
     out << "STRANDID=" << m_strand << std::endl;
     out << "NODES=" << m_nn << std::endl;
     out << "ELEMENTS=" << m_nc << std::endl;
@@ -32,6 +32,7 @@ void GRID::write(std::ostream &out)
         break;
     case FE_MESH_TYPE::POLY:
         out << "FEPOLYHEDRON" << std::endl;
+        break;
     default:
         break;
     }
@@ -90,6 +91,7 @@ void DATA::write(std::ostream &out)
         break;
     case FE_MESH_TYPE::POLY:
         out << "FEPOLYHEDRON";
+        break;
     default:
         break;
     }

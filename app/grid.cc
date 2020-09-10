@@ -162,6 +162,22 @@ int main(int argc, char *argv[])
         cnt += 2;
     }
 
+    std::ifstream in1(input_path);
+    if(in1.fail())
+        return -1;
+
+    std::ifstream in2(node_partition_path);
+    if(in2.fail())
+        return -2;
+
+    std::ifstream in3(cell_partition_path);
+    if(in3.fail())
+        return -3;
+
+    std::ofstream out(output_path);
+    if(out.fail())
+        return -4;
+
     switch (composition)
     {
     case FE_MESH_TYPE::TET:
@@ -175,18 +191,8 @@ int main(int argc, char *argv[])
         break;
     }
 
-    if(input_path.empty())
-        return -1;
-    else
-    {
-        std::ifstream in(input_path);
-        if(in.fail())
-            return -2;
-
-        loader->read(in);
-
-        in.close();
-    }
+    loader->read(in1);
+    in1.close();
 
     if(!zone_text.empty())
         loader->m_zone_text = zone_text;
@@ -194,40 +200,15 @@ int main(int argc, char *argv[])
     if(!title.empty())
         loader->m_title = title;
 
-    if(!node_partition_path.empty())
-    {
-        std::ifstream in(node_partition_path);
-        if(in.fail())
-            return -3;
+    loader->load_node_partition(in2);
+    in2.close();
 
-        loader->load_node_partition(in);
+    loader->load_cell_partition(in3);
+    in3.close();
 
-        in.close();
-    }
-
-    if(!cell_partition_path.empty())
-    {
-        std::ifstream in(cell_partition_path);
-        if(in.fail())
-            return -4;
-
-        loader->load_cell_partition(in);
-
-        in.close();
-    }
-
-    if(!output_path.empty())
-    {
-        std::ofstream out(output_path);
-        if(out.fail())
-            return -5;
-
-        loader->write(out);
-
-        out.close();
-    }
+    loader->write(out);
+    out.close();
 
     delete loader;
-
     return 0;
 }
