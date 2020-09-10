@@ -14,6 +14,10 @@ struct DATA_BLOCK
     std::string name;
     std::vector<T> data;
 
+    DATA_BLOCK() = default;
+
+    DATA_BLOCK(const std::string &nm, size_t len) : name(nm), data(len) {}
+
     void write(std::ostream &out, size_t nRec1Line, const char &sep)
     {
         size_t i = 0;
@@ -87,7 +91,7 @@ protected:
     std::vector<DATA_BLOCK<double>*> m_var;
 
 public:
-    DATA() {}
+    DATA(FE_MESH_TYPE tp) : m_tp(tp) {}
 
     virtual void read(std::istream &in) = 0;
 

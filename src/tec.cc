@@ -75,7 +75,10 @@ void DATA::write(std::ostream &out)
     out << std::endl;
 
     /// Zone Record
-    out << "ZONE T=\"" << m_zone_text << "\"" << std::endl;
+    out << "ZONE";
+    if(!m_zone_text.empty())
+        out << " T=\"" << m_zone_text << "\"";
+    out << std::endl;
     out << "STRANDID=" << m_strand << std::endl;
     out << "SOLUTIONTIME=" << m_tm << std::endl;
     out << "NODES=" << m_nn << std::endl;
