@@ -26,19 +26,19 @@ public:
         }
     }
 
-    void write_connectivity(std::ostream &out) override
+    void write_connectivity(std::ostream& out) override
     {
         static const char SEP = ' ';
 
-        for(size_t i = 0; i < m_nc; ++i)
+        for (size_t i = 0; i < m_nc; ++i)
         {
-            for(size_t j = 0; j < NODE_PER_CELL; ++j)
+            for (size_t j = 0; j < NODE_PER_CELL; ++j)
                 out << SEP << at(i, j);
             out << std::endl;
         }
     }
 
-    void read(std::istream &in) override
+    void read(std::istream& in) override
     {
         size_t n_node, n_face, n_cell, n_zone;
         in >> n_node >> n_face >> n_cell >> n_zone;
@@ -48,7 +48,7 @@ public:
 
         allocate_storage();
 
-        for(size_t i = 0; i < n_node; ++i)
+        for (size_t i = 0; i < n_node; ++i)
         {
             size_t tmp;
             in >> tmp;
@@ -61,23 +61,23 @@ public:
             std::getline(in, left);
         }
 
-        for(size_t i = 0; i < n_face; ++i)
+        for (size_t i = 0; i < n_face; ++i)
         {
             std::string tmp;
             std::getline(in, tmp);
         }
 
-        for(size_t i = 0; i < n_cell; ++i)
+        for (size_t i = 0; i < n_cell; ++i)
         {
             int tmp;
             in >> tmp;
 
             double c;
-            for(int j = 0; j < 3; ++j)
+            for (int j = 0; j < 3; ++j)
                 in >> c;
             in >> c;
 
-            for(size_t j = 0; j < NODE_PER_CELL; ++j)
+            for (size_t j = 0; j < NODE_PER_CELL; ++j)
                 in >> at(i, j);
 
             std::string left;
@@ -93,10 +93,10 @@ protected:
         m_z.data.resize(m_nn);
         m_node_par.data.resize(m_nn);
         m_cell_par.data.resize(m_nc);
-        m_connect.resize(NODE_PER_CELL*m_nc);
+        m_connect.resize(NODE_PER_CELL * m_nc);
     }
 
-    size_t &at(size_t i, size_t j)
+    size_t& at(size_t i, size_t j)
     {
         return m_connect.at(NODE_PER_CELL * i + j);
     }
@@ -107,18 +107,18 @@ class HeterogeneousMeshLoader : public GRID
 public:
     HeterogeneousMeshLoader() : GRID(FE_MESH_TYPE::POLY) {}
 
-    void read(std::istream &in) override
+    void read(std::istream& in) override
     {
         /// TODO
     }
 
-    void write_connectivity(std::ostream &out) override
+    void write_connectivity(std::ostream& out) override
     {
         /// TODO
     }
 };
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     std::string input_path;
     std::string output_path;
@@ -127,7 +127,8 @@ int main(int argc, char *argv[])
     std::string node_partition_path;
     std::string cell_partition_path;
     FE_MESH_TYPE composition;
-    GRID *loader;
+    bool composition_flag = false;
+    GRID* loader = nullptr;
 
     int cnt = 1;
     while (cnt < argc)
@@ -136,25 +137,27 @@ int main(int argc, char *argv[])
             input_path = argv[cnt + 1];
         else if (!std::strcmp(argv[cnt], "--output"))
             output_path = argv[cnt + 1];
-        else if(!std::strcmp(argv[cnt], "--zone-text"))
+        else if (!std::strcmp(argv[cnt], "--zone-text"))
             zone_text = argv[cnt + 1];
-        else if(!std::strcmp(argv[cnt], "--title"))
+        else if (!std::strcmp(argv[cnt], "--title"))
             title = argv[cnt + 1];
-        else if(!std::strcmp(argv[cnt], "--node-partition"))
+        else if (!std::strcmp(argv[cnt], "--node-partition"))
             node_partition_path = argv[cnt + 1];
-        else if(!std::strcmp(argv[cnt], "--cell-partition"))
+        else if (!std::strcmp(argv[cnt], "--cell-partition"))
             cell_partition_path = argv[cnt + 1];
         else if (!std::strcmp(argv[cnt], "--composition"))
         {
             std::string tmp(argv[cnt + 1]);
-            if(tmp == "tet")
+            if (tmp == "tet")
                 composition = FE_MESH_TYPE::TET;
-            else if(tmp == "hex")
+            else if (tmp == "hex")
                 composition = FE_MESH_TYPE::HEX;
-            else if(tmp == "poly")
+            else if (tmp == "poly")
                 composition = FE_MESH_TYPE::POLY;
             else
                 throw std::invalid_argument("Invalid composition description: \"" + tmp + "\".");
+
+            composition_flag = true;
         }
         else
             throw std::invalid_argument("Unrecognized option: \"" + std::string(argv[cnt]) + "\".");
@@ -163,20 +166,23 @@ int main(int argc, char *argv[])
     }
 
     std::ifstream in1(input_path);
-    if(in1.fail())
+    if (in1.fail())
         return -1;
 
     std::ifstream in2(node_partition_path);
-    if(in2.fail())
+    if (in2.fail())
         return -2;
 
     std::ifstream in3(cell_partition_path);
-    if(in3.fail())
+    if (in3.fail())
         return -3;
 
     std::ofstream out(output_path);
-    if(out.fail())
+    if (out.fail())
         return -4;
+
+    if (!composition_flag)
+        throw std::runtime_error("Composition not specified!");
 
     switch (composition)
     {
@@ -194,10 +200,10 @@ int main(int argc, char *argv[])
     loader->read(in1);
     in1.close();
 
-    if(!zone_text.empty())
+    if (!zone_text.empty())
         loader->m_zone_text = zone_text;
 
-    if(!title.empty())
+    if (!title.empty())
         loader->m_title = title;
 
     loader->load_node_partition(in2);

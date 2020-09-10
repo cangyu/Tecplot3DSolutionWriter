@@ -6,7 +6,7 @@
 #include <vector>
 #include <cstddef>
 
-enum class FE_MESH_TYPE : int {TET = 1, HEX = 2, POLY = 3};
+enum class FE_MESH_TYPE : int { TET = 1, HEX = 2, POLY = 3 };
 
 template<typename T>
 struct DATA_BLOCK
@@ -16,12 +16,12 @@ struct DATA_BLOCK
 
     DATA_BLOCK() = default;
 
-    DATA_BLOCK(const std::string &nm, size_t len) : name(nm), data(len) {}
+    DATA_BLOCK(const std::string& nm, size_t len) : name(nm), data(len) {}
 
-    void write(std::ostream &out, size_t nRec1Line, const char &sep)
+    void write(std::ostream& out, size_t nRec1Line, const char& sep)
     {
         size_t i = 0;
-        for (const auto &e : data)
+        for (const auto& e : data)
         {
             out << sep << e;
             ++i;
@@ -53,7 +53,7 @@ protected:
     DATA_BLOCK<size_t> m_cell_par;
 
 public:
-    GRID(FE_MESH_TYPE tp): m_tp(tp)
+    GRID(FE_MESH_TYPE tp) : m_tp(tp)
     {
         m_x.name = "X";
         m_y.name = "Y";
@@ -64,21 +64,21 @@ public:
 
     virtual ~GRID() = default;
 
-    virtual void read(std::istream &in) = 0;
+    virtual void read(std::istream& in) = 0;
 
-    void write(std::ostream &out);
+    void write(std::ostream& out);
 
-    virtual void write_connectivity(std::ostream &out) = 0;
+    virtual void write_connectivity(std::ostream& out) = 0;
 
-    void load_node_partition(std::istream &in)
+    void load_node_partition(std::istream& in)
     {
-        for(auto &e : m_node_par.data)
+        for (auto& e : m_node_par.data)
             in >> e;
     }
 
-    void load_cell_partition(std::istream &in)
+    void load_cell_partition(std::istream& in)
     {
-        for(auto &e : m_cell_par.data)
+        for (auto& e : m_cell_par.data)
             in >> e;
     }
 };
@@ -93,13 +93,13 @@ protected:
 public:
     DATA(FE_MESH_TYPE tp) : m_tp(tp) {}
 
-    virtual void read(std::istream &in) = 0;
+    virtual void read(std::istream& in) = 0;
 
-    void write(std::ostream &out);
+    void write(std::ostream& out);
 
     virtual ~DATA()
     {
-        for(auto e: m_var)
+        for (auto e : m_var)
             delete e;
 
         m_var.clear();

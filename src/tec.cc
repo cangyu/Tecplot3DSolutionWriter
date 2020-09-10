@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include "../inc/tec.h"
 
-void GRID::write(std::ostream &out)
+void GRID::write(std::ostream& out)
 {
     /// File Header
     out << "TITLE=\"" << m_title << "\"" << std::endl;
@@ -15,7 +15,7 @@ void GRID::write(std::ostream &out)
 
     /// Zone Record
     out << "ZONE";
-    if(!m_zone_text.empty())
+    if (!m_zone_text.empty())
         out << " T=\"" << m_zone_text << "\"";
     out << std::endl;
     out << "STRANDID=" << m_strand << std::endl;
@@ -61,22 +61,22 @@ void GRID::write(std::ostream &out)
     write_connectivity(out);
 }
 
-void DATA::write(std::ostream &out)
+void DATA::write(std::ostream& out)
 {
-    if(m_var.empty())
+    if (m_var.empty())
         throw std::runtime_error("NO data to write out!");
 
     /// File Header
     out << "TITLE=\"" << m_title << "\"" << std::endl;
     out << "FILETYPE=SOLUTION" << std::endl;
     out << "VARIABLES=\"" << m_var[0]->name << "\"";
-    for(size_t i = 1; i < m_var.size(); ++i)
+    for (size_t i = 1; i < m_var.size(); ++i)
         out << ",\"" << m_var[i]->name << "\"";
     out << std::endl;
 
     /// Zone Record
     out << "ZONE";
-    if(!m_zone_text.empty())
+    if (!m_zone_text.empty())
         out << " T=\"" << m_zone_text << "\"";
     out << std::endl;
     out << "STRANDID=" << m_strand << std::endl;
@@ -87,8 +87,8 @@ void DATA::write(std::ostream &out)
     switch (m_tp)
     {
     case FE_MESH_TYPE::TET:
-       out << "FETETRAHEDRON";
-       break;
+        out << "FETETRAHEDRON";
+        break;
     case FE_MESH_TYPE::HEX:
         out << "FEBRICK";
         break;
@@ -106,6 +106,6 @@ void DATA::write(std::ostream &out)
     static const size_t RECORD_PER_LINE = 10;
     static const char SEP = ' ';
 
-    for(auto e : m_var)
+    for (auto e : m_var)
         e->write(out, RECORD_PER_LINE, SEP);
 }
