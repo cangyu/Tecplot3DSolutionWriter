@@ -14,10 +14,12 @@ void GRID::write(std::ostream& out)
     out << "\"" << m_cell_par.name << "\"" << std::endl;
 
     /// Zone Record
-    out << "ZONE";
-    if (!m_zone_text.empty())
-        out << " T=\"" << m_zone_text << "\"";
-    out << std::endl;
+    out << "ZONE T=\"";
+    if (m_zone_text.empty())
+        out << "GRID";
+    else
+        out << m_zone_text;
+    out << "\"" << std::endl;
     out << "STRANDID=" << m_strand << std::endl;
     out << "NODES=" << m_nn << std::endl;
     out << "ELEMENTS=" << m_nc << std::endl;
