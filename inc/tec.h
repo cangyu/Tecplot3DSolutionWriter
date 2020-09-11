@@ -35,9 +35,9 @@ struct DATA_BLOCK
 
 struct HEADER
 {
-    std::string m_title;
+    std::string m_title = "3D CFD";
     std::string m_zone_text;
-    size_t m_strand;
+    size_t m_strand = 0;
     size_t m_nn;
     size_t m_nc;
 };
